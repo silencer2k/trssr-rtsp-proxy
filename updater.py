@@ -149,7 +149,9 @@ class Updater:
 
         self.all_paths = all_paths
 
-        path_config = self.api.get("paths/list")["items"]
+        path_config = {
+            item["name"]: item for item in self.api.get("paths/list")["items"]
+        }
 
         if removed_paths:
             for path in removed_paths:
@@ -159,7 +161,9 @@ class Updater:
                     )
                     self.api.delete(f"config/paths/delete/{path}")
 
-            path_config = self.api.get("paths/list")["items"]
+            path_config = {
+                item["name"]: item for item in self.api.get("paths/list")["items"]
+            }
 
         if added_paths:
             LOGGER.info("[updater] new paths available: " + (", ".join(added_paths)))
@@ -178,7 +182,7 @@ class Updater:
                 channel_id, stream = path, "main"
 
             if path in path_config:
-                if path_config[path]["sourceReady"]:
+                if path_config[path]["ready"]:
                     continue
 
                 LOGGER.info(f"[updater] removing path '{path}': source is not ready")
