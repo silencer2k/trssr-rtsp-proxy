@@ -1,15 +1,19 @@
-FROM aler9/rtsp-simple-server AS rtsp
-FROM python:3.9
+FROM bluenviron/mediamtx:1.15.4 AS rtsp
+FROM python:3.9-trixie
 
-COPY --from=rtsp rtsp-simple-server .
-COPY --from=rtsp rtsp-simple-server.yml .
+COPY --from=rtsp mediamtx .
+COPY --from=rtsp mediamtx.yml .
 
-COPY updater.py .
+RUN sed -r -i 's/^(api:\s*)no/\1yes/' mediamtx.yml
+
 COPY requirements.txt .
-COPY config.yml .
 
 RUN pip install --no-cache-dir -r requirements.txt
-RUN cat config.yml >> rtsp-simple-server.yml
+
+COPY updater.py .
+COPY cfg.yml .
+
+RUN cat cfg.yml >> mediamtx.yml && rm cfg.yml
 
 EXPOSE 8554
 
@@ -21,4 +25,4 @@ ENV PASSWORD=<password>
 
 ENV PATHS=*
 
-ENTRYPOINT [ "./rtsp-simple-server" ]
+ENTRYPOINT [ "/mediamtx" ]

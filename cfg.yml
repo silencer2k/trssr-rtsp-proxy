@@ -1,0 +1,3 @@
+  __updater:
+    runOnInit: python /updater.py
+    runOnInitRestart: yes

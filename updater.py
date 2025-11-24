@@ -6,9 +6,9 @@ import time
 
 import jstyleson
 import requests
+import urllib3
 from cachetools import TTLCache, cached
 from transliterate import translit
-from urllib3.exceptions import InsecureRequestWarning
 
 TRASSIR_API_HOST = os.environ["API_HOST"]
 TRASSIR_RTSP_HOST = os.environ["RTSP_HOST"]
@@ -30,7 +30,7 @@ logging.basicConfig(stream=sys.stdout, level=logging.INFO)
 
 LOGGER = logging.getLogger()
 
-requests.packages.urllib3.disable_warnings(category=InsecureRequestWarning)
+urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 
 class TrassirAPI:
@@ -71,12 +71,16 @@ class TrassirAPI:
 
 class API:
     def get(self, method):
-        resp = requests.get(f"{API_HOST}/v1/{method}")
+        resp = requests.get(f"{API_HOST}/v3/{method}")
         return resp.json()
 
     def post(self, method, payload=None):
-        resp = requests.post(f"{API_HOST}/v1/{method}", json=payload)
+        resp = requests.post(f"{API_HOST}/v3/{method}", json=payload)
         return resp.json() if len(resp.content) > 0 else None
+
+    def delete(self, method):
+        resp = requests.delete(f"{API_HOST}/v3/{method}")
+        return resp.json()
 
 
 class Updater:
@@ -153,7 +157,7 @@ class Updater:
                     LOGGER.info(
                         f"[updater] removing path '{path}': no longer available"
                     )
-                    self.api.post(f"config/paths/remove/{path}")
+                    self.api.delete(f"config/paths/delete/{path}")
 
             path_config = self.api.get("paths/list")["items"]
 
@@ -178,7 +182,7 @@ class Updater:
                     continue
 
                 LOGGER.info(f"[updater] removing path '{path}': source is not ready")
-                self.api.post(f"config/paths/remove/{path}")
+                self.api.delete(f"config/paths/delete/{path}")
 
             source = self.get_video(channels[channel_id], stream)
 

@@ -1,6 +1,0 @@
-api: yes
-apiAddress: :9997
-paths:
-  __updater:
-    runOnInit: python ./updater.py
-    runOnInitRestart: yes
