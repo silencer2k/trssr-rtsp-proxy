@@ -2,7 +2,7 @@
 ## Basic usage
 
 ```
-docker buildx build -t trssr-rtsp-proxy github.com/Silencer2K/trssr-rtsp-proxy
+docker buildx build -t trssr-rtsp-proxy https://github.com/Silencer2K/trssr-rtsp-proxy.git
 docker run \
     -p 8554:8554 \
     -e API_HOST=https://<trassir_host>:8080 \
